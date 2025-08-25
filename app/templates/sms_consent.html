@@ -1,0 +1,323 @@
+<!-- app/templates/sms_consent.html -->
+{% extends "base.html" %}
+
+{% block title %}SMS Consent Agreement - Early Warning Text{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="card-title mb-0 py-2"><i class="fas fa-file-contract me-2"></i>SMS Consent Agreement</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Required for SMS Notifications</h5>
+                        <p class="mb-0">To receive text message alerts, we need your explicit consent as required by law. Please read and agree to the terms below.</p>
+                    </div>
+                    
+                    <!-- Privacy and Legal Notice -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Privacy & Security Notice</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-3">Your privacy and security are our top priorities. Before proceeding, please note that text messages are not confidential. Anyone with access to your cell phone may view these messages. Additionally, your service provider, as well as <strong>EarlyWarningText, LLC</strong>, may have access to these messages. Standard text message rates may apply, depending on your service provider.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Consent Agreement -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-handshake me-2"></i>Consent Agreement</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-3">We will only send you text messages with your explicit consent. By agreeing to this Consent for text messaging agreement, you authorize <strong>EarlyWarningText, LLC</strong> to send you text messages regarding emergency alerts, natural disasters, power outages, space weather events, and other information related to your account.</p>
+                            
+                            <p class="mb-3">You can opt out of this service at any time by:</p>
+                            <ul class="mb-3">
+                                <li>Texting <strong>STOP</strong> to any message we send you</li>
+                                <li>Updating your preferences in your account dashboard</li>
+                                <li>Contacting us directly</li>
+                            </ul>
+                            
+                            <p class="mb-3">For assistance, text <strong>HELP</strong>, or you can get help directly at <strong>info@earlywarningtext.com</strong> or <strong>(555) 123-4567</strong>. You can request a copy of our terms of service and privacy policies at any time.</p>
+                            
+                            <div class="alert alert-warning">
+                                <p class="mb-0"><strong>I understand this service is optional, and I can stop it at any time. I would like to receive text messages from EarlyWarningText, LLC.</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Consent Form -->
+                    <form method="POST" action="{{ url_for('main.sms_consent') }}" class="needs-validation" novalidate>
+                        <input type="hidden" name="signup_data" value="{{ signup_data }}">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="printed_name" class="form-label">Printed Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="printed_name" name="printed_name" 
+                                               value="{{ user_name }}" placeholder="Your full legal name" required>
+                                        <div class="invalid-feedback">
+                                            Please provide your full name.
+                                        </div>
+                                    </div>
+                                    <div class="form-text">This should match your legal name</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-calendar"></i></span>
+                                        <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required>
+                                        <div class="invalid-feedback">
+                                            Please provide your date of birth.
+                                        </div>
+                                    </div>
+                                    <div class="form-text">Required for age verification (18+)</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="cell_phone" class="form-label">Cell Phone Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-phone"></i></span>
+                                <input type="tel" class="form-control" id="cell_phone" name="cell_phone" 
+                                       value="{{ phone_number }}" placeholder="+1 (555) 555-5555" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid cell phone number.
+                                </div>
+                            </div>
+                            <div class="form-text">This number will receive text message alerts</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="digital_signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-signature"></i></span>
+                                <input type="text" class="form-control" id="digital_signature" name="digital_signature" 
+                                       placeholder="Type your full name as your digital signature" required>
+                                <div class="invalid-feedback">
+                                    Please type your full name as your digital signature.
+                                </div>
+                            </div>
+                            <div class="form-text">Type your full name exactly as it appears above</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Consent Decision <span class="text-danger">*</span></label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="consent_decision" id="consent_yes" value="yes" required>
+                                        <label class="form-check-label" for="consent_yes">
+                                            <i class="fas fa-check-circle text-success me-2"></i><strong>Yes</strong> - I consent to receive text messages
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="consent_decision" id="consent_no" value="no" required>
+                                        <label class="form-check-label" for="consent_no">
+                                            <i class="fas fa-times-circle text-danger me-2"></i><strong>No</strong> - I do not consent to text messages
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback d-block">
+                                Please select your consent decision.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="age_verification" name="age_verification" required>
+                                <label class="form-check-label" for="age_verification">
+                                    I certify that I am 18 years of age or older <span class="text-danger">*</span>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must be 18 or older to provide consent.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="terms_agreement" name="terms_agreement" required>
+                                <label class="form-check-label" for="terms_agreement">
+                                    I have read and understand the SMS consent agreement above <span class="text-danger">*</span>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must read and agree to the consent terms.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-light border p-3 mb-4">
+                            <p class="mb-0 small text-muted">
+                                <strong>Date:</strong> {{ current_date }}<br>
+                                <strong>Time:</strong> {{ current_time }}<br>
+                                <strong>IP Address:</strong> {{ user_ip }} (recorded for legal compliance)
+                            </p>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-signature me-2"></i>Submit Consent Agreement
+                            </button>
+                            <a href="{{ url_for('main.signup') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Sign Up
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="card-title mb-0 py-2"><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-mobile-alt me-2"></i>What messages will I receive?</h6>
+                            <p class="small text-muted mb-3">You'll receive emergency alerts about natural disasters, power outages, and space weather events that meet our severity thresholds.</p>
+                            
+                            <h6><i class="fas fa-dollar-sign me-2"></i>Will I be charged?</h6>
+                            <p class="small text-muted mb-3">Standard text message rates from your carrier may apply. We do not charge for our alert service.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-stop-circle me-2"></i>How do I opt out?</h6>
+                            <p class="small text-muted mb-3">Text STOP to any message, update your account settings, or contact us directly. You can opt out at any time.</p>
+                            
+                            <h6><i class="fas fa-clock me-2"></i>How often will I get messages?</h6>
+                            <p class="small text-muted mb-3">Only when qualifying emergency events occur. This could be several per week during active periods, or none for weeks during quiet periods.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-fill signature when user types in name field
+    document.getElementById('printed_name').addEventListener('input', function() {
+        const signatureField = document.getElementById('digital_signature');
+        // Only auto-fill if signature is empty
+        if (!signatureField.value || signatureField.value === signatureField.placeholder) {
+            signatureField.value = this.value;
+        }
+        signatureField.placeholder = `Type "${this.value}" as your digital signature`;
+    });
+
+    // Age verification based on date of birth
+    document.getElementById('date_of_birth').addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        
+        const ageCheckbox = document.getElementById('age_verification');
+        if (age < 18) {
+            ageCheckbox.checked = false;
+            ageCheckbox.disabled = true;
+            this.setCustomValidity('You must be 18 or older to provide SMS consent.');
+            alert('You must be 18 or older to provide SMS consent.');
+        } else {
+            ageCheckbox.disabled = false;
+            this.setCustomValidity('');
+        }
+    });
+
+    // Form validation
+    (function () {
+        'use strict'
+        
+        const form = document.querySelector('.needs-validation');
+        
+        form.addEventListener('submit', event => {
+            const signature = form.querySelector('#digital_signature').value.trim();
+            const printedName = form.querySelector('#printed_name').value.trim();
+            const consentDecision = form.querySelector('input[name="consent_decision"]:checked');
+            const dateOfBirth = form.querySelector('#date_of_birth').value;
+            const ageVerification = form.querySelector('#age_verification').checked;
+            const termsAgreement = form.querySelector('#terms_agreement').checked;
+            
+            let isValid = true;
+            let errorMessages = [];
+            
+            // Check if consent decision is selected
+            if (!consentDecision) {
+                isValid = false;
+                errorMessages.push('Please select your consent decision.');
+            }
+            
+            // Signature validation
+            if (!signature) {
+                isValid = false;
+                errorMessages.push('Please provide your digital signature.');
+            } else if (signature.toLowerCase() !== printedName.toLowerCase()) {
+                isValid = false;
+                errorMessages.push('Digital signature must match your printed name exactly.');
+                document.getElementById('digital_signature').setCustomValidity('Digital signature must match your printed name exactly.');
+            } else {
+                document.getElementById('digital_signature').setCustomValidity('');
+            }
+            
+            // Age validation
+            if (dateOfBirth) {
+                const birthDate = new Date(dateOfBirth);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                if (age < 18) {
+                    isValid = false;
+                    errorMessages.push('You must be 18 years or older to provide SMS consent.');
+                }
+            }
+            
+            // Age verification checkbox
+            if (!ageVerification) {
+                isValid = false;
+                errorMessages.push('You must certify that you are 18 years of age or older.');
+            }
+            
+            // Terms agreement
+            if (!termsAgreement) {
+                isValid = false;
+                errorMessages.push('You must read and agree to the SMS consent terms.');
+            }
+            
+            // Show errors if any
+            if (errorMessages.length > 0) {
+                alert('Please fix the following errors:\n\n' + errorMessages.join('\n'));
+            }
+            
+            if (!form.checkValidity() || !isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    })();
+</script>
+{% endblock %}

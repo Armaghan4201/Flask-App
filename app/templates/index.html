@@ -1,0 +1,115 @@
+﻿<!-- app/templates/index.html -->
+{% extends "base.html" %}
+
+{% block title %}Early Warning Text - Real-time Alerts{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Stay Informed. Stay Safe.</h1>
+            <p class="lead">Get real-time notifications about natural disasters, power outages, and space weather events.</p>
+            <hr class="my-4">
+            <p>Early Warning Text monitors multiple data sources to provide timely alerts via SMS and email when critical events occur.</p>
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" href="{{ url_for('main.subscribe') }}">Subscribe Now</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Natural Disasters</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Get alerts for earthquakes (magnitude 7.0+), tsunamis, tropical cyclones, and major floods from GDACS and FEMA.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Power Outages</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Receive notifications when significant power outages (20%+ of the US) are detected through EIA data.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Space Weather</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Be informed about X-class solar flares and other space weather events that could impact communications and power grids.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if events %}
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h2>Recent Alerts</h2>
+        <hr>
+        {% for event in events %}
+        <div class="card event-card 
+            {% if event.event_type in ['earthquake', 'solar_flare'] and event.severity.startswith('X') %}
+                event-severity-high
+            {% elif event.source == 'FEMA' and event.severity == 'Major' %}
+                event-severity-high
+            {% elif event.event_type == 'power_outage' %}
+                event-severity-high
+            {% else %}
+                event-severity-medium
+            {% endif %}
+        ">
+            <div class="card-body">
+                <h5 class="card-title">{{ event.event_type|title }} - {{ event.severity }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ event.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</h6>
+                <p class="card-text">{{ event.description }}</p>
+                {% if event.location %}
+                <p class="card-text"><small class="text-muted">Location: {{ event.location }}</small></p>
+                {% endif %}
+                <p class="card-text"><small class="text-muted">Source: {{ event.source }}</small></p>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="mt-3">
+            <a href="{{ url_for('main.events') }}" class="btn btn-outline-primary">View All Events</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h2>How It Works</h2>
+        <hr>
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="bg-light p-3 rounded">
+                    <h4>1. We Monitor</h4>
+                    <p>Our system continuously checks multiple trusted data sources for critical events.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="bg-light p-3 rounded">
+                    <h4>2. We Analyze</h4>
+                    <p>Events are analyzed against thresholds to determine if they warrant an alert.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="bg-light p-3 rounded">
+                    <h4>3. We Notify</h4>
+                    <p>When critical thresholds are met, alerts are sent to subscribers via SMS and/or email.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

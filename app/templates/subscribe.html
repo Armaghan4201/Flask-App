@@ -1,0 +1,195 @@
+﻿<!-- app/templates/subscribe.html -->
+{% extends "base.html" %}
+
+{% block title %}Subscribe to Alerts - Early Warning Text{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-7 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0 py-2"><i class="fas fa-bell me-2"></i>Subscribe to Alerts</h3>
+                </div>
+                <div class="card-body p-4">
+                    <p class="lead mb-4">Receive important alerts about natural disasters, power outages, and space weather events delivered directly to you.</p>
+                    
+                    <form method="POST" action="{{ url_for('main.subscribe') }}" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="name" class="form-label">Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Your full name" aria-describedby="nameHelp">
+                            </div>
+                            <div id="nameHelp" class="form-text">We'll use this to personalize your alerts</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" aria-describedby="emailHelp">
+                            </div>
+                            <div id="emailHelp" class="form-text">We'll send alert notifications to this email address</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-phone"></i></span>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="+1 (555) 555-5555" aria-describedby="phoneHelp">
+                            </div>
+                            <div id="phoneHelp" class="form-text">We'll send SMS alerts to this number (include country code)</div>
+                        </div>
+                        
+                        <div class="alert alert-info p-3 d-flex">
+                            <div class="me-3 fs-4">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0"><strong>Note:</strong> You must provide at least an email or phone number and select at least one notification method.</p>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h5 class="mb-3">Notification Preferences</h5>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="notify_email" name="notify_email" checked>
+                            <label class="form-check-label" for="notify_email">Receive Email Notifications</label>
+                        </div>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="notify_sms" name="notify_sms" checked>
+                            <label class="form-check-label" for="notify_sms">Receive SMS Notifications</label>
+                        </div>
+                        
+                        <div class="alert alert-light border p-3 mb-4">
+                            <small class="text-muted">
+                                By subscribing, you agree to receive automated notifications from Early Warning Text. Standard SMS rates may apply for text messages. You can unsubscribe at any time.
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Subscribe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="card-title mb-0 py-2"><i class="fas fa-info-circle me-2"></i>What You'll Receive</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                <div class="mb-3 text-primary">
+                                    <i class="fas fa-globe-americas fa-3x"></i>
+                                </div>
+                                <h5>Natural Disasters</h5>
+                                <p class="text-muted small">Earthquakes (7.0+), tsunamis, cyclones, floods</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                <div class="mb-3 text-primary">
+                                    <i class="fas fa-plug fa-3x"></i>
+                                </div>
+                                <h5>Power Outages</h5>
+                                <p class="text-muted small">Major outages affecting 20%+ of the US</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                <div class="mb-3 text-primary">
+                                    <i class="fas fa-sun fa-3x"></i>
+                                </div>
+                                <h5>Space Weather</h5>
+                                <p class="text-muted small">X-class solar flares and severe space events</p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <div class="alert alert-light border">
+                        <p class="mb-0 text-muted"><i class="fas fa-shield-alt me-2"></i>We aim to provide timely, accurate alerts. However, we cannot guarantee immediate delivery or coverage of all events.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        
+        const forms = document.querySelectorAll('.needs-validation')
+        
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                const email = form.querySelector('#email').value
+                const phone = form.querySelector('#phone_number').value
+                const emailNotify = form.querySelector('#notify_email').checked
+                const smsNotify = form.querySelector('#notify_sms').checked
+                
+                let isValid = true
+                
+                // Check if at least one contact method is provided
+                if (!email && !phone) {
+                    isValid = false
+                    event.preventDefault()
+                    event.stopPropagation()
+                    alert('Please provide at least an email address or phone number.')
+                }
+                
+                // Check if at least one notification method is selected
+                if (!emailNotify && !smsNotify) {
+                    isValid = false
+                    event.preventDefault()
+                    event.stopPropagation()
+                    alert('Please select at least one notification method.')
+                }
+                
+                // Email validation if provided
+                if (email && !validateEmail(email)) {
+                    isValid = false
+                    event.preventDefault()
+                    event.stopPropagation()
+                    alert('Please enter a valid email address.')
+                }
+                
+                // Phone validation if provided
+                if (phone && !validatePhone(phone)) {
+                    isValid = false
+                    event.preventDefault()
+                    event.stopPropagation()
+                    alert('Please enter a valid phone number with country code.')
+                }
+                
+                if (isValid) {
+                    form.classList.add('was-validated')
+                }
+            }, false)
+        })
+        
+        function validateEmail(email) {
+            const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+            return re.test(email)
+        }
+        
+        function validatePhone(phone) {
+            // Remove all non-digit characters except plus sign
+            const digitsOnly = phone.replace(/[^\d+]/g, '')
+            // Check if it has a plus sign and is a valid length
+            return digitsOnly.startsWith('+') && digitsOnly.length >= 8 && digitsOnly.length <= 15
+        }
+    })()
+</script>
+{% endblock %}

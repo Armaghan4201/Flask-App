@@ -1,0 +1,529 @@
+﻿<!-- app/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/bell_icon.ico" type="image/x-icon">
+    <link rel="icon" href="/static/bell_icon.ico" type="image/x-icon">
+    <title>{% block title %}Early Warning Text{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d47a1;
+            --secondary-color: #ff6600;
+            --light-bg: #f8f9fa;
+            --dark-bg: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --text-dark: #212529;
+            --text-light: #f8f9fa;
+            --border-radius: 0.5rem;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: #f5f7f9;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: var(--primary-color);
+            padding: 0.8rem 1rem;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            color: rgba(255, 255, 255, 0.9) !important;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover, .nav-link:focus {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+        
+        .container {
+            padding: 1.5rem 15px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            border-bottom: none;
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .card-header.bg-primary {
+            background: linear-gradient(135deg, var(--primary-color), #1565c0) !important;
+            color: white;
+        }
+        
+        .card-header.bg-danger {
+            background: linear-gradient(135deg, var(--danger-color), #c62828) !important;
+            color: white;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .btn {
+            font-weight: 500;
+            padding: 0.5rem 1.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background: #0c3d87;
+            border-color: #0c3d87;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .alert-container {
+            margin: 1rem 0;
+        }
+        
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .footer {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 3rem 0 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .footer h5 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .footer-copyright {
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Event card styling */
+        .event-card {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .event-severity-high {
+            border-left: 5px solid var(--danger-color);
+        }
+        
+        .event-severity-medium {
+            border-left: 5px solid var(--warning-color);
+        }
+        
+        .event-severity-low {
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+        
+        /* Form controls */
+        .form-control, .form-select {
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            border: 1px solid #ced4da;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 71, 161, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        /* Jumbotron styling */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), #1a237e);
+            color: white;
+            padding: 3rem 0;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+        
+        .hero-section h1 {
+            font-weight: 700;
+        }
+        
+        /* Feature cards */
+        .feature-card {
+            height: 100%;
+            transition: var(--transition);
+        }
+        
+        .feature-card .card-header {
+            background: linear-gradient(135deg, var(--primary-color), #1565c0);
+            color: white;
+        }
+        
+        .feature-card .card-body {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        /* Statistics */
+        .stat-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            height: 100%;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        /* How it works section */
+        .steps-container {
+            position: relative;
+        }
+        
+        .step-card {
+            height: 100%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .step-number {
+            width: 3rem;
+            height: 3rem;
+            line-height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Pagination */
+        .pagination .page-link {
+            color: var(--primary-color);
+            background-color: white;
+            border-color: #dee2e6;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin: 0 0.2rem;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: var(--primary-color);
+        }
+        
+        /* User dropdown */
+        .dropdown-toggle::after {
+            display: none;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .card-body {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <i class="fas fa-bell me-2"></i> Early Warning Text
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('main.index') %}active{% endif %}" href="{{ url_for('main.index') }}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('main.events') %}active{% endif %}" href="{{ url_for('main.events') }}">
+                            <i class="fas fa-history me-1"></i> Recent Events
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {{ current_user.name }}
+                                <i class="fas fa-chevron-down ms-2"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.profile') }}">
+                                        <i class="fas fa-user-cog me-2"></i> Profile Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.change_password') }}">
+                                        <i class="fas fa-key me-2"></i> Change Password
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('main.logout') }}">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == url_for('main.login') %}active{% endif %}" href="{{ url_for('main.login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Sign In
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == url_for('main.signup') %}active{% endif %}" href="{{ url_for('main.signup') }}">
+                                <i class="fas fa-user-plus me-1"></i> Sign Up
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="alert-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% elif category == 'danger' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif category == 'info' %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5><i class="fas fa-bell me-2"></i> Early Warning Text</h5>
+                    <p>Receive real-time notifications about natural disasters, power outages, and space weather events. Our system continuously monitors multiple trusted data sources to keep you informed and safe.</p>
+                    <div class="mt-3">
+                        {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('main.signup') }}" class="btn btn-outline-light">Sign Up Today</a>
+                        {% else %}
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light">Go to Dashboard</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('main.index') }}"><i class="fas fa-angle-right me-2"></i>Home</a></li>
+                        <li class="mb-2"><a href="{{ url_for('main.events') }}"><i class="fas fa-angle-right me-2"></i>Recent Events</a></li>
+                        {% if current_user.is_authenticated %}
+                            <li class="mb-2"><a href="{{ url_for('main.dashboard') }}"><i class="fas fa-angle-right me-2"></i>Dashboard</a></li>
+                            <li class="mb-2"><a href="{{ url_for('main.profile') }}"><i class="fas fa-angle-right me-2"></i>Profile</a></li>
+                        {% else %}
+                            <li class="mb-2"><a href="{{ url_for('main.signup') }}"><i class="fas fa-angle-right me-2"></i>Sign Up</a></li>
+                            <li class="mb-2"><a href="{{ url_for('main.login') }}"><i class="fas fa-angle-right me-2"></i>Sign In</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>Data Sources</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="https://www.gdacs.org" target="_blank"><i class="fas fa-external-link-alt me-2"></i>GDACS</a></li>
+                        <li class="mb-2"><a href="https://services.swpc.noaa.gov" target="_blank"><i class="fas fa-external-link-alt me-2"></i>NOAA Space Weather</a></li>
+                        <li class="mb-2"><a href="https://www.eia.gov" target="_blank"><i class="fas fa-external-link-alt me-2"></i>EIA</a></li>
+                        <li class="mb-2"><a href="https://www.fema.gov" target="_blank"><i class="fas fa-external-link-alt me-2"></i>FEMA</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@earlywarningtext.com</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>(555) 123-4567</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Alert St, Safety City</li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="#" class="me-2 text-light"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="me-2 text-light"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="me-2 text-light"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright text-center">
+                <p>© 2025 Early Warning Text. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

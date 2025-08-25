@@ -1,0 +1,153 @@
+﻿<!-- app/templates/unsubscribe.html -->
+{% extends "base.html" %}
+
+{% block title %}Delete Account - Early Warning Text{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0 py-2"><i class="fas fa-user-times me-2"></i>Delete Account</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="display-1 text-danger mb-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h4 class="text-danger">Are you sure you want to delete your account?</h4>
+                        <p class="lead">This action cannot be undone. All your data will be permanently removed from our system.</p>
+                    </div>
+                    
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Warning</h5>
+                        <p class="mb-0">Deleting your account will:</p>
+                        <ul class="mt-2 mb-0">
+                            <li>Remove all your personal information</li>
+                            <li>Stop all alert notifications</li>
+                            <li>Delete your notification preferences</li>
+                            <li>Cannot be reversed</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('main.unsubscribe') }}" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="confirm_delete" class="form-label">Type <strong>DELETE</strong> to confirm:</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-danger text-white"><i class="fas fa-exclamation-triangle"></i></span>
+                                <input type="text" class="form-control" id="confirm_delete" name="confirm_delete" 
+                                       placeholder="Type DELETE here" required>
+                                <div class="invalid-feedback">
+                                    You must type DELETE to confirm account deletion.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-danger btn-lg" id="deleteButton" disabled>
+                                <i class="fas fa-user-times me-2"></i>Delete My Account
+                            </button>
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel and Return to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="card-title mb-0 py-2"><i class="fas fa-lightbulb me-2"></i>Alternatives to Deleting</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p>Instead of deleting your account completely, you might consider:</p>
+                    
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="me-3 text-primary">
+                            <i class="fas fa-bell-slash fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Disable Notifications</h5>
+                            <p class="text-muted mb-0">Turn off all notifications while keeping your account for future use.</p>
+                            <a href="{{ url_for('main.profile') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="fas fa-cog me-1"></i>Manage Notifications
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="me-3 text-primary">
+                            <i class="fas fa-user-edit fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Update Your Preferences</h5>
+                            <p class="text-muted mb-0">Change your contact information or notification settings.</p>
+                            <a href="{{ url_for('main.profile') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="fas fa-edit me-1"></i>Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start">
+                        <div class="me-3 text-primary">
+                            <i class="fas fa-pause fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Take a Break</h5>
+                            <p class="text-muted mb-0">Simply log out and come back when you need alerts again.</p>
+                            <a href="{{ url_for('main.logout') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="fas fa-sign-out-alt me-1"></i>Sign Out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Enable delete button only when "DELETE" is typed correctly
+    document.getElementById('confirm_delete').addEventListener('input', function() {
+        const deleteButton = document.getElementById('deleteButton');
+        const confirmText = this.value;
+        
+        if (confirmText === 'DELETE') {
+            deleteButton.disabled = false;
+            deleteButton.classList.remove('btn-secondary');
+            deleteButton.classList.add('btn-danger');
+        } else {
+            deleteButton.disabled = true;
+            deleteButton.classList.remove('btn-danger');
+            deleteButton.classList.add('btn-secondary');
+        }
+    });
+
+    // Form validation
+    (function () {
+        'use strict'
+        
+        const form = document.querySelector('.needs-validation')
+        
+        form.addEventListener('submit', event => {
+            const confirmText = document.getElementById('confirm_delete').value
+            
+            if (confirmText !== 'DELETE') {
+                event.preventDefault()
+                event.stopPropagation()
+                alert('You must type DELETE exactly to confirm account deletion.')
+                return
+            }
+            
+            // Final confirmation
+            if (!confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+        }, false)
+    })()
+</script>
+{% endblock %}

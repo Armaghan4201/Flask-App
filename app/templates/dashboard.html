@@ -1,0 +1,220 @@
+<!-- app/templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Early Warning Text{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-1">Welcome back, {{ user.name }}!</h1>
+                    <p class="lead text-muted">Manage your alert preferences and view your account information.</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('main.profile') }}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-user-cog me-2"></i>Edit Profile
+                    </a>
+                    <a href="{{ url_for('main.logout') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Account Overview -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-user me-2"></i>Account Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Name:</strong> {{ user.name }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Phone:</strong> 
+                        {{ user.phone_number if user.phone_number else 'Not provided' }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Member since:</strong> {{ user.created_at.strftime('%B %d, %Y') }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Account Status:</strong>
+                        {% if user.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notification Preferences -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-bell me-2"></i>Notification Preferences</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   {% if user.notify_email %}checked{% endif %} disabled>
+                            <label class="form-check-label">
+                                <i class="fas fa-envelope me-2"></i>Email Notifications
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   {% if user.notify_sms %}checked{% endif %} disabled>
+                            <label class="form-check-label">
+                                <i class="fas fa-sms me-2"></i>SMS Notifications
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{{ url_for('main.profile') }}" class="btn btn-info btn-sm">
+                            <i class="fas fa-edit me-2"></i>Update Preferences
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.events') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-history me-2"></i>View Recent Events
+                        </a>
+                        <a href="{{ url_for('main.profile') }}" class="btn btn-outline-info">
+                            <i class="fas fa-user-edit me-2"></i>Edit Profile
+                        </a>
+                        <a href="{{ url_for('main.change_password') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                        <a href="{{ url_for('main.unsubscribe') }}" class="btn btn-outline-danger">
+                            <i class="fas fa-user-times me-2"></i>Delete Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Events -->
+    {% if events %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="fas fa-clock me-2"></i>Recent Events</h5>
+                        <a href="{{ url_for('main.events') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Severity</th>
+                                    <th>Location</th>
+                                    <th>Date</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events[:5] %}
+                                <tr>
+                                    <td>
+                                        {% if event.event_type == 'earthquake' %}
+                                            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                                        {% elif event.event_type == 'solar_flare' %}
+                                            <i class="fas fa-sun text-warning me-2"></i>
+                                        {% elif event.event_type == 'power_outage' %}
+                                            <i class="fas fa-plug text-dark me-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-exclamation-circle text-info me-2"></i>
+                                        {% endif %}
+                                        {{ event.event_type|title }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ event.severity }}</span>
+                                    </td>
+                                    <td>{{ event.location or 'N/A' }}</td>
+                                    <td>{{ event.timestamp.strftime('%m/%d/%Y') }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ event.source }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Alert Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Your Alert Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="stat-container">
+                                <div class="stat-number">{{ events|length }}</div>
+                                <div class="stat-label">Total Events This Month</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-container">
+                                <div class="stat-number">
+                                    {% if user.notify_email and user.notify_sms %}2{% elif user.notify_email or user.notify_sms %}1{% else %}0{% endif %}
+                                </div>
+                                <div class="stat-label">Active Notification Methods</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-container">
+                                <div class="stat-number">
+                                    {{ (user.created_at.now() - user.created_at).days }}
+                                </div>
+                                <div class="stat-label">Days Since Signup</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-container">
+                                <div class="stat-number text-success">Active</div>
+                                <div class="stat-label">Account Status</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

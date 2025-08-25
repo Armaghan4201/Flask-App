@@ -1,0 +1,584 @@
+﻿<!-- app/templates/events.html -->
+{% extends "base.html" %}
+
+{% block title %}Recent Events - Early Warning Text{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 15px;
+        font-size: 1.25rem;
+    }
+    
+    .event-icon-earthquake {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    
+    .event-icon-solar_flare {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    
+    .event-icon-power_outage {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+    
+    .event-icon-tsunami {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+    
+    .event-icon-cyclone {
+        background-color: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0;
+    }
+    
+    .event-icon-flood {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+    
+    .event-icon-default {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+    }
+    
+    .timeline-point {
+        position: absolute;
+        left: -30px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        top: 15px;
+    }
+    
+    .filter-section {
+        background-color: #f8f9fa;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .event-badge {
+        border-radius: 30px;
+        padding: 0.35em 0.8em;
+        font-size: 0.75em;
+        font-weight: 600;
+    }
+    
+    .event-detail-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-detail-icon {
+        width: 20px;
+        margin-right: 10px;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Recent Events</h1>
+            <p class="lead text-muted">A history of events detected by our system in the past 30 days.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection">
+                <i class="fas fa-filter me-2"></i>Filter Events
+            </button>
+        </div>
+    </div>
+    
+    <!-- Filter Section (Collapsed by default) -->
+    <div class="collapse mb-4" id="filterSection">
+        <div class="filter-section shadow-sm">
+            <h5 class="mb-3"><i class="fas fa-sliders-h me-2"></i>Filter Options</h5>
+            <form id="filterForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Event Type</label>
+                        <select class="form-select" id="eventTypeFilter">
+                            <option value="">All Types</option>
+                            <option value="earthquake">Earthquake</option>
+                            <option value="solar_flare">Solar Flare</option>
+                            <option value="power_outage">Power Outage</option>
+                            <option value="ts">Tsunami</option>
+                            <option value="tc">Tropical Cyclone</option>
+                            <option value="fl">Flood</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Source</label>
+                        <select class="form-select" id="sourceFilter">
+                            <option value="">All Sources</option>
+                            <option value="GDACS">GDACS</option>
+                            <option value="NOAA">NOAA</option>
+                            <option value="EIA">EIA</option>
+                            <option value="FEMA">FEMA</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Severity</label>
+                        <select class="form-select" id="severityFilter">
+                            <option value="">All Levels</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-outline-secondary me-2" id="resetFilters">
+                        <i class="fas fa-undo me-2"></i>Reset
+                    </button>
+                    <button type="button" class="btn btn-primary" id="applyFilters">
+                        <i class="fas fa-check me-2"></i>Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Events Timeline -->
+    {% if events.items %}
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="timeline p-4">
+                {% for event in events.items %}
+                <div class="timeline-item">
+                    <div class="timeline-point"></div>
+                    <div class="card event-card shadow-sm
+                        {% if event.event_type in ['earthquake', 'solar_flare'] and event.severity.startswith('X') %}
+                            event-severity-high
+                        {% elif event.source == 'FEMA' and event.severity == 'Major' %}
+                            event-severity-high
+                        {% elif event.event_type == 'power_outage' %}
+                            event-severity-high
+                        {% else %}
+                            event-severity-medium
+                        {% endif %}
+                    ">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="event-icon 
+                                    {% if event.event_type == 'earthquake' %}
+                                        event-icon-earthquake
+                                    {% elif event.event_type == 'solar_flare' %}
+                                        event-icon-solar_flare
+                                    {% elif event.event_type == 'power_outage' %}
+                                        event-icon-power_outage
+                                    {% elif event.event_type == 'ts' %}
+                                        event-icon-tsunami
+                                    {% elif event.event_type == 'tc' %}
+                                        event-icon-cyclone
+                                    {% elif event.event_type == 'fl' %}
+                                        event-icon-flood
+                                    {% else %}
+                                        event-icon-default
+                                    {% endif %}
+                                ">
+                                    {% if event.event_type == 'earthquake' %}
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    {% elif event.event_type == 'solar_flare' %}
+                                        <i class="fas fa-sun"></i>
+                                    {% elif event.event_type == 'power_outage' %}
+                                        <i class="fas fa-plug"></i>
+                                    {% elif event.event_type == 'ts' %}
+                                        <i class="fas fa-water"></i>
+                                    {% elif event.event_type == 'tc' %}
+                                        <i class="fas fa-wind"></i>
+                                    {% elif event.event_type == 'fl' %}
+                                        <i class="fas fa-water"></i>
+                                    {% else %}
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="card-title mb-0 me-2">{{ event.event_type|title }}</h5>
+                                        <span class="badge bg-primary">{{ event.severity }}</span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i> {{ event.timestamp.strftime('%b %d, %Y') }} 
+                                        <i class="far fa-clock ms-2 me-1"></i> {{ event.timestamp.strftime('%H:%M UTC') }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="card-text">{{ event.description }}</p>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    {% if event.location %}
+                                    <div class="event-detail-row">
+                                        <div class="event-detail-icon">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </div>
+                                        <div>{{ event.location }}</div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="event-detail-row">
+                                        <div class="event-detail-icon">
+                                            <i class="fas fa-database"></i>
+                                        </div>
+                                        <div>Source: <span class="badge bg-secondary">{{ event.source }}</span></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-md-end align-items-center mt-3 mt-md-0">
+                                    <button class="btn btn-sm btn-outline-primary view-details-btn" data-event-id="{{ event.id }}">
+                                        <i class="fas fa-info-circle me-1"></i> View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if events.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.events', page=events.prev_num) }}" aria-label="Previous">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-left"></i> Previous</span>
+                </li>
+            {% endif %}
+            
+            {% for page_num in events.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if page_num == events.page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.events', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if events.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.events', page=events.next_num) }}" aria-label="Next">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next <i class="fas fa-chevron-right"></i></span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    {% else %}
+    <div class="alert alert-info shadow-sm">
+        <div class="d-flex">
+            <div class="me-3 fs-4">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div>
+                <h4 class="alert-heading">No Events Found</h4>
+                <p class="mb-0">No events have been recorded in the past 30 days. Check back later for updates.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Event Information Section -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="card-title mb-0 py-2"><i class="fas fa-info-circle me-2"></i>Event Types & Thresholds</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3 text-primary">
+                                            <i class="fas fa-globe-americas fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Natural Disasters</h5>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-exclamation-triangle text-danger me-2"></i>Earthquake</span>
+                                            <span class="badge bg-primary rounded-pill">7.0+ magnitude</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-water text-primary me-2"></i>Tsunami</span>
+                                            <span class="badge bg-primary rounded-pill">All alerts</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-wind text-info me-2"></i>Tropical Cyclone</span>
+                                            <span class="badge bg-primary rounded-pill">All alerts</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-water text-info me-2"></i>Flood</span>
+                                            <span class="badge bg-primary rounded-pill">Major events</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3 text-primary">
+                                            <i class="fas fa-sun fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Space Weather</h5>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-sun text-warning me-2"></i>Solar Flare</span>
+                                            <span class="badge bg-primary rounded-pill">X-class</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-meteor text-danger me-2"></i>Coronal Mass Ejection</span>
+                                            <span class="badge bg-primary rounded-pill">Earth-directed</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-broadcast-tower text-warning me-2"></i>Geomagnetic Storm</span>
+                                            <span class="badge bg-primary rounded-pill">G3+</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3 text-primary">
+                                            <i class="fas fa-plug fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Infrastructure</h5>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-plug text-danger me-2"></i>Power Outage</span>
+                                            <span class="badge bg-primary rounded-pill">20%+ of US</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <span><i class="fas fa-bolt text-warning me-2"></i>Grid Instability</span>
+                                            <span class="badge bg-primary rounded-pill">Major events</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventDetailsModalLabel">Event Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">Loading event details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize event details modal functionality
+        const viewDetailsBtns = document.querySelectorAll('.view-details-btn');
+        const eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+        const modalBody = document.querySelector('#eventDetailsModal .modal-body');
+        
+        viewDetailsBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const eventId = this.getAttribute('data-event-id');
+                
+                // Show loading state
+                modalBody.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Loading event details...</p>
+                    </div>
+                `;
+                
+                eventDetailsModal.show();
+                
+                // In a real application, you would fetch event details from the server
+                // For this example, we'll simulate a request with setTimeout
+                setTimeout(() => {
+                    // For demonstration purposes, we're just creating dummy content
+                    // In a real app, you would fetch data from the server using fetch or AJAX
+                    
+                    const event = {
+                        id: eventId,
+                        // Add more dummy data as needed
+                    };
+                    
+                    updateModalContent(event);
+                }, 1000);
+            });
+        });
+        
+        function updateModalContent(event) {
+            // Get the parent card of the clicked button to extract event info
+            const eventCard = document.querySelector(`.view-details-btn[data-event-id="${event.id}"]`).closest('.event-card');
+            const eventTitle = eventCard.querySelector('.card-title').textContent;
+            const eventSeverity = eventCard.querySelector('.badge').textContent;
+            const eventDescription = eventCard.querySelector('.card-text').textContent;
+            const eventTime = eventCard.querySelector('.text-muted').textContent;
+            const eventLocation = eventCard.querySelector('.fa-map-marker-alt')?.parentElement.nextElementSibling.textContent || 'Not specified';
+            const eventSource = eventCard.querySelector('.fa-database').parentElement.nextElementSibling.textContent.replace('Source: ', '');
+            
+            // Update modal content
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4>${eventTitle}</h4>
+                        <div class="badge bg-primary mb-3">${eventSeverity}</div>
+                        <p>${eventDescription}</p>
+                        
+                        <h5 class="mt-4">Event Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex">
+                                <div class="event-detail-icon">
+                                    <i class="far fa-clock"></i>
+                                </div>
+                                <div>${eventTime}</div>
+                            </li>
+                            <li class="list-group-item d-flex">
+                                <div class="event-detail-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>${eventLocation}</div>
+                            </li>
+                            <li class="list-group-item d-flex">
+                                <div class="event-detail-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div>${eventSource}</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-light rounded mb-3">
+                            <i class="fas fa-chart-line fa-4x text-primary mb-3"></i>
+                            <h5>Impact Analysis</h5>
+                            <p class="text-muted small">Potential impact assessment and recommendations.</p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="#" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                <i class="fas fa-share-alt me-2"></i>Share Event
+                            </a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fas fa-print me-2"></i>Print Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This information is provided for awareness purposes. Please consult official sources and local authorities for specific guidance during emergencies.
+                </div>
+            `;
+        }
+        
+        // Filter functionality (placeholder for demonstration)
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        const applyFiltersBtn = document.getElementById('applyFilters');
+        
+        resetFiltersBtn.addEventListener('click', function() {
+            document.getElementById('eventTypeFilter').value = '';
+            document.getElementById('sourceFilter').value = '';
+            document.getElementById('severityFilter').value = '';
+        });
+        
+        applyFiltersBtn.addEventListener('click', function() {
+            // In a real application, you would apply filters by reloading the page with query parameters
+            // or by filtering the DOM elements directly
+            
+            alert('Filter functionality would be implemented in a real application.');
+            
+            // Hide filter section after applying
+            const filterSection = document.getElementById('filterSection');
+            const bsCollapse = bootstrap.Collapse.getInstance(filterSection);
+            bsCollapse.hide();
+        });
+    });
+</script>
+{% endblock %}

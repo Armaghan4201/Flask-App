@@ -1,0 +1,225 @@
+<!-- app/templates/profile.html -->
+{% extends "base.html" %}
+
+{% block title %}Profile Settings - Early Warning Text{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-1">Profile Settings</h1>
+                    <p class="lead text-muted">Update your personal information and notification preferences.</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0 py-2"><i class="fas fa-user-cog me-2"></i>Account Information</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('main.profile') }}" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="name" name="name" 
+                                               value="{{ user.name }}" placeholder="Your full name" required>
+                                        <div class="invalid-feedback">
+                                            Please provide your full name.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" name="email" 
+                                               value="{{ user.email }}" readonly>
+                                    </div>
+                                    <div class="form-text">Email address cannot be changed. Contact support if needed.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-phone"></i></span>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                       value="{{ user.phone_number or '' }}" placeholder="+1 (555) 555-5555">
+                            </div>
+                            <div class="form-text">Include country code (e.g., +1 for US/Canada)</div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h5 class="mb-3">Notification Preferences</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="notify_email" name="notify_email" 
+                                           {% if user.notify_email %}checked{% endif %}>
+                                    <label class="form-check-label" for="notify_email">
+                                        <i class="fas fa-envelope me-2"></i>Email Notifications
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="notify_sms_display" 
+                                               {% if user.notify_sms and user.sms_consent_given %}checked{% endif %} disabled>
+                                        <label class="form-check-label" for="notify_sms_display">
+                                            <i class="fas fa-sms me-2"></i>SMS Notifications
+                                            {% if user.sms_consent_given %}
+                                                <span class="badge bg-success ms-2">Enabled</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary ms-2">Disabled</span>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                    {% if user.sms_consent_given %}
+                                        <small class="text-muted d-block mt-1">
+                                            SMS consent provided during signup on {{ user.sms_consent_date.strftime('%B %d, %Y') }}
+                                        </small>
+                                    {% else %}
+                                        <small class="text-muted d-block mt-1">
+                                            SMS consent was not provided during signup
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info p-3 d-flex">
+                            <div class="me-3 fs-4">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0">You must have at least one notification method enabled. SMS consent can only be provided during signup for legal compliance.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="card-title mb-0"><i class="fas fa-key me-2"></i>Security</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Keep your account secure by updating your password regularly.</p>
+                            <a href="{{ url_for('main.change_password') }}" class="btn btn-warning">
+                                <i class="fas fa-key me-2"></i>Change Password
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title mb-0"><i class="fas fa-user-times me-2"></i>Danger Zone</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Permanently delete your account and all associated data.</p>
+                            <a href="{{ url_for('main.unsubscribe') }}" class="btn btn-danger">
+                                <i class="fas fa-user-times me-2"></i>Delete Account
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="card-title mb-0 py-2"><i class="fas fa-info-circle me-2"></i>Account Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Member since:</strong> {{ user.created_at.strftime('%B %d, %Y') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Account Status:</strong> 
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        
+        const forms = document.querySelectorAll('.needs-validation')
+        
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                const phone = form.querySelector('#phone_number').value
+                const emailNotify = form.querySelector('#notify_email').checked
+                const smsNotify = form.querySelector('#notify_sms').checked
+                
+                let isValid = true
+                
+                // Phone validation (if provided)
+                if (phone && !validatePhone(phone)) {
+                    isValid = false
+                    alert('Please enter a valid phone number with country code.')
+                }
+                
+                // Notification method validation
+                if (!emailNotify && !smsNotify) {
+                    isValid = false
+                    alert('You must have at least one notification method enabled.')
+                }
+                
+                // Note: SMS notifications cannot be changed after signup for compliance
+                
+                if (!isValid) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                } else {
+                    form.classList.add('was-validated')
+                }
+            }, false)
+        })
+        
+        function validatePhone(phone) {
+            // Remove all non-digit characters except plus sign
+            const digitsOnly = phone.replace(/[^\d+]/g, '')
+            // Check if it has a plus sign and is a valid length
+            return digitsOnly.startsWith('+') && digitsOnly.length >= 8 && digitsOnly.length <= 15
+        }
+    })()
+</script>
+{% endblock %}

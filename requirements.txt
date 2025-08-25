@@ -1,0 +1,31 @@
+﻿# Core Flask Framework
+flask==3.0.0
+flask-sqlalchemy==3.1.1
+flask-migrate==4.0.5
+flask-login==0.6.3
+
+# Security & Authentication
+werkzeug==3.0.1
+
+# External API Integration
+requests==2.31.0
+twilio==8.10.3
+google-auth==2.25.2
+google-auth-oauthlib==1.1.0
+google-api-python-client==2.111.0
+gdacs-api==2.0.0
+
+# Background Job Processing
+apscheduler==3.10.4
+
+# Configuration & Environment
+python-dotenv==1.0.0
+
+# Development & Debugging
+icecream==2.1.3
+
+# Optional: Production Server (uncomment for production)
+# gunicorn==21.2.0
+
+# Optional: Enhanced Database Support (uncomment for PostgreSQL)
+# psycopg2-binary==2.9.9
